@@ -1,0 +1,89 @@
+SQLite $ python manage.py check
+System check identified no issues (0 silenced).
+
+SQLite $ python manage.py makemigrations --check --dry-run
+No changes detected
+
+SQLite $ python manage.py test -v 1
+Found 21 test(s).
+System check identified no issues (0 silenced).
+Creating test database for alias 'default'...
+
+.............Invoice delivery failed for order 1
+Traceback (most recent call last):
+  File "C:\Users\DELL\OneDrive\School\Django Assignments\marketplace\shop\services.py", line 56, in send_invoice
+    send_mail(
+    ~~~~~~~~~^
+        f"Invoice #{order.pk}",
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        fail_silently=False,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\DELL\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1241, in _execute_mock_call
+    raise effect
+OSError: offline
+........
+----------------------------------------------------------------------
+Ran 21 tests in 35.358s
+
+OK
+Destroying test database for alias 'default'...
+
+
+MariaDB $ python manage.py check
+System check identified no issues (0 silenced).
+
+MariaDB $ python manage.py makemigrations --check --dry-run
+No changes detected
+
+MariaDB $ python manage.py test -v 1
+Found 21 test(s).
+System check identified no issues (0 silenced).
+Creating test database for alias 'default'...
+
+.............Invoice delivery failed for order 2
+Traceback (most recent call last):
+  File "C:\Users\DELL\OneDrive\School\Django Assignments\marketplace\shop\services.py", line 56, in send_invoice
+    send_mail(
+    ~~~~~~~~~^
+        f"Invoice #{order.pk}",
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        fail_silently=False,
+        ^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\DELL\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1176, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1180, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Local\Programs\Python\Python314\Lib\unittest\mock.py", line 1241, in _execute_mock_call
+    raise effect
+OSError: offline
+........
+----------------------------------------------------------------------
+Ran 21 tests in 52.437s
+
+OK
+Destroying test database for alias 'default'...
+
+
+manage.py collectstatic --noinput
+
+155 static files copied to 'C:\Users\DELL\OneDrive\School\Django Assignments\marketplace\staticfiles'.
+
+-m flake8 .
+
+21 tests passed on SQLite and MariaDB. TLS verification remained enabled.
+Browser checks: buyer login -> product -> session cart -> checkout -> invoice.
+Live JSONPlaceholder /posts?userId=1 returned ten posts, all user ID 1.
