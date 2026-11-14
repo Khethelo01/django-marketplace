@@ -12,6 +12,78 @@ from .models import Store, Product, Order
 from .services import create_order, send_invoice
 
 
+@login_required
+def vendors(request):
+    """List vendor accounts as an entry point to their stores."""
+    from .models import User
+
+    return render(
+        request,
+        "shop/vendors.html",
+        {
+            "vendors": User.objects.filter(role="vendor").order_by("username"),
+        },
+    )
+
+
+@login_required
+def vendor_stores(request, pk):
+    """Display stores belonging to the selected vendor."""
+    from .models import User
+
+    vendor = get_object_or_404(User, pk=pk, role="vendor")
+    return render(
+        request,
+        "shop/stores.html",
+        {
+            "stores": Store.objects.filter(vendor=vendor),
+            "title": f"Stores by {vendor.username}",
+        },
+    )
+
+
+@login_required
+def stores(request):
+    """List all stores for buyers and owned stores for vendors."""
+    records = Store.objects.select_related("vendor")
+    if request.user.role == "vendor":
+        records = records.filter(vendor=request.user)
+    return render(
+        request,
+        "shop/stores.html",
+        {
+            "stores": records,
+            "title": (
+                "Your stores" if request.user.role == "vendor" else "Stores"
+            ),
+        },
+    )
+
+
+@login_required
+def products(request):
+    """List all buyer-visible products or the vendor's own products."""
+    records = Product.objects.select_related("store")
+    if request.user.role == "vendor":
+        records = records.filter(store__vendor=request.user)
+    return render(request, "shop/products.html", {"products": records})
+
+
+@login_required
+def review_overview(request):
+    """Show all reviews for the vendor's products in a single view."""
+    if request.user.role != "vendor":
+        return HttpResponseForbidden("Vendors only.")
+    from .models import Review
+
+    records = (
+        Review.objects.filter(product__store__vendor=request.user)
+        .select_related("product", "product__store", "buyer")
+        .order_by("-created_at", "-pk")
+    )
+    return render(request, "shop/reviews.html", {"reviews": records})
+
+
 def role_required(role):
     """Build a decorator that requires login and the specified role."""
 

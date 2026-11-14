@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}
+<h1>{% if user.role == 'vendor' %}Your products{% else %}Products{% endif %}</h1><div class="grid">{% for product in products %}<article class="item"><h2><a href="{% url 'product' product.pk %}">{{ product.name }}</a></h2><p><a href="{% url 'store' product.store.pk %}">{{ product.store.name }}</a></p><p>{{ product.description }}</p><p class="price">R{{ product.price }}</p></article>{% empty %}<p>No products to show.</p>{% endfor %}</div>
+{% endblock %}

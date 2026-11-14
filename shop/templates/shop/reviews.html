@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<h1>Your product reviews</h1><p>All feedback across your stores, newest first.</p>
+{% for review in reviews %}<article class="item"><h2><a href="{% url 'product' review.product.pk %}">{{ review.product.name }}</a></h2><p>{{ review.product.store.name }} · {{ review.buyer.username }} · {{ review.rating }}/5 · {% if review.verified %}Verified purchase{% else %}Unverified review{% endif %}</p><p>{{ review.content }}</p></article>{% empty %}<p>No reviews have been submitted for your products yet.</p>{% endfor %}
+{% endblock %}

@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}
+<h1>Vendors</h1><p>Choose a vendor to explore their stores.</p>
+<div class="grid">{% for vendor in vendors %}<article class="item"><h2><a href="{% url 'vendor-stores' vendor.pk %}">{{ vendor.username }}</a></h2><a href="{% url 'vendor-stores' vendor.pk %}">View stores</a></article>{% empty %}<p>No vendors yet.</p>{% endfor %}</div>
+{% endblock %}

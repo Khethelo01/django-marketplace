@@ -156,3 +156,16 @@ Visit /external-posts/ for real JSONPlaceholder sample posts, or
 shop/functions/jsonplaceholder.py. Network/status/JSON failures show a fallback.
 pip-system-certs uses the operating system certificate store; TLS verification
 remains enabled. Live testing returned ten posts, all with user ID 1.
+
+
+## Part 2 review update
+
+Buyer menu: Vendors -> vendor stores -> store products; Stores -> store
+products; Products -> all products. Vendor menu: Stores -> owned stores and
+their products; Products -> all owned products; Reviews -> feedback across
+all owned stores in one place. The protected /api/reviews/ endpoint continues
+to provide the same vendor-wide review retrieval for API clients.
+
+The assessor requires a successful Part 1 review before Part 2 resubmission.
+This update uses the corrected Part 1 code, but do not request Part 2 review
+until Part 1 has been approved. No successful review is claimed here.

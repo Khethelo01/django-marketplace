@@ -1,18 +1,12 @@
 manage.py check --database default
 System check identified no issues (0 silenced).
 
-manage.py migrate --noinput
-Operations to perform:
-  Apply all migrations: admin, auth, authtoken, contenttypes, sessions, shop
-Running migrations:
-  No migrations to apply.
-
 manage.py test shop -v 1
-Found 25 test(s).
+Found 28 test(s).
 System check identified no issues (0 silenced).
 Creating test database for alias 'default'...
 
-.................Invoice delivery failed for order 2
+....................Invoice delivery failed for order 2
 Traceback (most recent call last):
   File "C:\Users\DELL\OneDrive\School\Django Assignments\marketplace\shop\services.py", line 60, in send_invoice
     send_mail(
@@ -35,12 +29,10 @@ Traceback (most recent call last):
 OSError: offline
 ........
 ----------------------------------------------------------------------
-Ran 25 tests in 35.019s
+Ran 28 tests in 37.149s
 
 OK
 Destroying test database for alias 'default'...
 
 
 -m flake8 .
-
-All classes/functions/methods have docstrings (AST audit). MariaDB only.

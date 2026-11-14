@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}
+<h1>{{ title }}</h1><div class="grid">{% for store in stores %}<article class="item"><h2><a href="{% url 'store' store.pk %}">{{ store.name }}</a></h2><p>By {{ store.vendor.username }}</p><p>{{ store.description }}</p><a href="{% url 'store' store.pk %}">View products</a></article>{% empty %}<p>No stores to show.</p>{% endfor %}</div>
+{% endblock %}

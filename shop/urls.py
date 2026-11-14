@@ -7,6 +7,13 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("register/", views.register, name="register"),
     path("dashboard/", views.dashboard, name="dashboard"),
+    path("vendors/", views.vendors, name="vendors"),
+    path(
+        "vendors/<int:pk>/stores/", views.vendor_stores, name="vendor-stores"
+    ),
+    path("stores/", views.stores, name="stores"),
+    path("products/", views.products, name="products"),
+    path("reviews/", views.review_overview, name="reviews"),
     path("stores/new/", views.store_edit, name="store-create"),
     path("stores/<int:pk>/", views.store_detail, name="store"),
     path("stores/<int:pk>/edit/", views.store_edit, name="store-edit"),
