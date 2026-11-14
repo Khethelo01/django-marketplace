@@ -1,3 +1,5 @@
+"""Api for the Marketplace application."""
+
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -7,6 +9,7 @@ from .serializers import StoreSerializer, ProductSerializer, ReviewSerializer
 
 @api_view(["GET", "POST"])
 def stores(request):
+    """Stores using validated application data."""
     if request.method == "GET":
         records = Store.objects.all()
         if request.query_params.get("vendor"):
@@ -27,6 +30,7 @@ def stores(request):
 
 @api_view(["GET", "POST"])
 def products(request, pk):
+    """Products using validated application data."""
     store = get_object_or_404(Store, pk=pk)
     if request.method == "GET":
         return Response(
@@ -44,6 +48,7 @@ def products(request, pk):
 
 @api_view(["GET"])
 def reviews(request):
+    """Reviews using validated application data."""
     if request.user.role != "vendor":
         return Response({"detail": "Vendors only."}, status=403)
     records = Review.objects.filter(product__store__vendor=request.user)

@@ -1,7 +1,10 @@
+"""Jsonplaceholder for the Marketplace application."""
+
 import requests
 
 
 def get_posts(user_id=None):
+    """Get posts using validated application data."""
     params = {} if user_id is None else {"userId": user_id}
     try:
         response = requests.get(

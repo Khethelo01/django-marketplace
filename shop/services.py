@@ -1,3 +1,5 @@
+"""Services for the Marketplace application."""
+
 import logging
 from decimal import Decimal
 from django.core.mail import send_mail
@@ -9,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def create_order(buyer, cart):
+    """Validate the cart and atomically save an order and reduce stock."""
     if not cart:
         raise ValueError("Your cart is empty.")
     with transaction.atomic():
@@ -48,6 +51,7 @@ def create_order(buyer, cart):
 
 
 def send_invoice(order):
+    """Email an invoice and record whether delivery succeeded."""
     body = f"Invoice #{order.pk}\n"
     for item in order.items.all():
         body += f"{item.name}: {item.quantity} x R{item.unit_price}\n"

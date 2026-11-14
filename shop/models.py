@@ -1,3 +1,5 @@
+"""Models for the Marketplace application."""
+
 from decimal import Decimal
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -6,6 +8,8 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """Represent a registered buyer or vendor with a unique email."""
+
     role = models.CharField(
         max_length=10,
         choices=[("buyer", "Buyer"), ("vendor", "Vendor")],
@@ -15,6 +19,8 @@ class User(AbstractUser):
 
 
 class Store(models.Model):
+    """Represent a vendor-owned store and its catalogue identity."""
+
     vendor = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE
     )
@@ -22,10 +28,13 @@ class Store(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
+        """Return a readable name for display and administration."""
         return self.name
 
 
 class Product(models.Model):
+    """Store product details, decimal price and available stock."""
+
     store = models.ForeignKey(
         Store, on_delete=models.CASCADE, related_name="products"
     )
@@ -39,10 +48,13 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(default=0)
 
     def __str__(self):
+        """Return a readable name for display and administration."""
         return self.name
 
 
 class Order(models.Model):
+    """Record a buyer checkout and its historical invoice total."""
+
     buyer = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT
     )
@@ -52,6 +64,8 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    """Preserve purchased quantities and historical unit prices."""
+
     order = models.ForeignKey(
         Order, on_delete=models.CASCADE, related_name="items"
     )
@@ -62,6 +76,8 @@ class OrderItem(models.Model):
 
 
 class Review(models.Model):
+    """Record buyer feedback and derive purchase verification."""
+
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, related_name="reviews"
     )
@@ -76,6 +92,7 @@ class Review(models.Model):
 
     @property
     def verified(self):
+        """Return whether this buyer has purchased the reviewed product."""
         return OrderItem.objects.filter(
             product=self.product, order__buyer=self.buyer
         ).exists()

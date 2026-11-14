@@ -1,3 +1,5 @@
+"""Tests for the Marketplace application."""
+
 from decimal import Decimal
 from unittest.mock import patch
 import requests
@@ -13,7 +15,10 @@ from .functions.jsonplaceholder import get_posts
     EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend"
 )
 class ShopTests(TestCase):
+    """Shoptests configuration and behaviour."""
+
     def setUp(self):
+        """Create fresh users, inventory and API client for each test."""
         self.vendor = User.objects.create_user(
             "vendor", "vendor@example.com", "SafePass!234", role="vendor"
         )
@@ -34,6 +39,7 @@ class ShopTests(TestCase):
         self.api = APIClient()
 
     def test_registration(self):
+        """Verify registration."""
         response = self.client.post(
             "/register/",
             {
@@ -52,12 +58,14 @@ class ShopTests(TestCase):
         )
 
     def test_buyer_cannot_create_store(self):
+        """Verify buyer cannot create store."""
         self.client.force_login(self.buyer)
         self.assertEqual(
             self.client.post("/stores/new/", {"name": "Bad"}).status_code, 403
         )
 
     def test_vendor_creates_store(self):
+        """Verify vendor creates store."""
         self.client.force_login(self.vendor)
         self.client.post("/stores/new/", {"name": "New store"})
         self.assertEqual(
@@ -65,6 +73,7 @@ class ShopTests(TestCase):
         )
 
     def test_owner_checks(self):
+        """Verify owner checks."""
         self.client.force_login(self.other)
         self.assertEqual(
             self.client.post(f"/stores/{self.store.pk}/edit/", {}).status_code,
@@ -78,22 +87,26 @@ class ShopTests(TestCase):
         )
 
     def test_delete_get_is_safe(self):
+        """Verify delete get is safe."""
         self.client.force_login(self.vendor)
         self.client.get(f"/delete/product/{self.product.pk}/")
         self.assertTrue(Product.objects.filter(pk=self.product.pk).exists())
 
     def test_cart_persists(self):
+        """Verify cart persists."""
         self.client.force_login(self.buyer)
         self.client.post(f"/cart/add/{self.product.pk}/", {"quantity": "2"})
         self.client.get("/")
         self.assertEqual(self.client.session["cart"][str(self.product.pk)], 2)
 
     def test_negative_cart_quantity_rejected(self):
+        """Verify negative cart quantity rejected."""
         self.client.force_login(self.buyer)
         self.client.post(f"/cart/add/{self.product.pk}/", {"quantity": "-1"})
         self.assertEqual(self.client.session.get("cart", {}), {})
 
     def test_checkout_invoice_email_and_stock(self):
+        """Verify checkout invoice email and stock."""
         self.client.force_login(self.buyer)
         self.client.post(f"/cart/add/{self.product.pk}/", {"quantity": "2"})
         self.assertEqual(self.client.post("/checkout/").status_code, 302)
@@ -104,15 +117,18 @@ class ShopTests(TestCase):
         self.assertEqual(self.product.stock, 3)
 
     def test_stock_failure_rolls_back(self):
+        """Verify stock failure rolls back."""
         with self.assertRaises(ValueError):
             create_order(self.buyer, {str(self.product.pk): 99})
         self.assertFalse(Order.objects.exists())
 
     def test_empty_checkout_rejected(self):
+        """Verify empty checkout rejected."""
         with self.assertRaises(ValueError):
             create_order(self.buyer, {})
 
     def test_verified_review(self):
+        """Verify verified review."""
         review = Review.objects.create(
             buyer=self.buyer, product=self.product, rating=4, content="Good"
         )
@@ -121,12 +137,14 @@ class ShopTests(TestCase):
         self.assertTrue(review.verified)
 
     def test_invoice_failure_and_retry(self):
+        """Verify invoice failure and retry."""
         order = create_order(self.buyer, {str(self.product.pk): 1})
         with patch("shop.services.send_mail", side_effect=OSError("offline")):
             self.assertFalse(send_invoice(order))
         self.assertTrue(send_invoice(order))
 
     def test_password_token_invalidated_after_password_change(self):
+        """Verify password token invalidated after password change."""
         from django.contrib.auth.tokens import default_token_generator
 
         token = default_token_generator.make_token(self.buyer)
@@ -138,9 +156,11 @@ class ShopTests(TestCase):
         )
 
     def test_api_requires_auth(self):
+        """Verify api requires auth."""
         self.assertEqual(self.api.get("/api/stores/").status_code, 401)
 
     def test_api_vendor_create(self):
+        """Verify api vendor create."""
         self.api.force_authenticate(self.vendor)
         response = self.api.post(
             "/api/stores/", {"name": "API store"}, format="json"
@@ -158,6 +178,7 @@ class ShopTests(TestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_api_write_owner_checks(self):
+        """Verify api write owner checks."""
         for user in [self.buyer, self.other]:
             self.api.force_authenticate(user)
             self.assertEqual(
@@ -168,6 +189,7 @@ class ShopTests(TestCase):
             )
 
     def test_api_both_roles_can_read(self):
+        """Verify api both roles can read."""
         for user in [self.buyer, self.vendor]:
             self.api.force_authenticate(user)
             self.assertEqual(self.api.get("/api/stores/").status_code, 200)
@@ -179,6 +201,7 @@ class ShopTests(TestCase):
             )
 
     def test_api_review_owner_scope(self):
+        """Verify api review owner scope."""
         Review.objects.create(
             buyer=self.buyer, product=self.product, rating=5, content="Good"
         )
@@ -189,6 +212,7 @@ class ShopTests(TestCase):
 
     @patch("shop.functions.jsonplaceholder.requests.get")
     def test_external_filter_and_shape(self, get):
+        """Verify external filter and shape."""
         get.return_value.json.return_value = [
             {"id": 1, "userId": 1, "title": "One", "body": "Text"},
             {"id": 2, "userId": 2, "title": "Two", "body": "Other"},
@@ -204,6 +228,7 @@ class ShopTests(TestCase):
         side_effect=requests.Timeout,
     )
     def test_external_failure(self, get):
+        """Verify external failure."""
         self.assertEqual(get_posts(), [])
         self.assertContains(
             self.client.get("/external-posts/"), "Posts could not be loaded"
@@ -211,5 +236,6 @@ class ShopTests(TestCase):
 
     @patch("shop.functions.jsonplaceholder.requests.get")
     def test_invalid_json(self, get):
+        """Verify invalid json."""
         get.return_value.json.side_effect = ValueError("bad json")
         self.assertEqual(get_posts(), [])

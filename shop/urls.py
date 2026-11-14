@@ -1,3 +1,5 @@
+"""Urls for the Marketplace application."""
+
 from django.urls import path
 from . import views, api
 
